@@ -1,0 +1,9 @@
+rich
+fastapi==0.108.0
+uvicorn==0.25.0
+pydantic==2.5.3
+pymongo[srv]
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
