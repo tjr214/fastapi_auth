@@ -7,12 +7,13 @@ from passlib.context import CryptContext
 
 from datetime import datetime, timedelta
 
-from models.user_model import User, UserProfile
+from models.user_model import User
 from config.db import users_collection
 from config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
 
-from bson import ObjectId
-from typing import List, Annotated
+# from util.user_utils import get_user
+
+from typing import Annotated
 
 from dotenv import load_dotenv
 import os
@@ -27,19 +28,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("TODOAPP_ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
-user_router = APIRouter(
-    prefix=f"{API_PREFIX}/user",
+auth_router = APIRouter(
+    prefix=f"{API_PREFIX}/auth",
     tags=["users"],
 )
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/user/token")
-
-
-class CreateUserRequest(BaseModel):
-    email: str
-    password: str
-    profile: UserProfile
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/auth/token")
 
 
 class Token(BaseModel):
@@ -66,7 +61,7 @@ def get_user(email: str) -> User | None:
             return User(**user_data)
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> User:
+async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)]) -> User:
     """
     Return a `User` object representing the active user, validated via an access token
     """
@@ -107,28 +102,7 @@ def authenticate_user(email: str, password: str) -> User:
     return user
 
 
-@user_router.post("/", status_code=status.HTTP_201_CREATED)
-def create_user(create_user_request: CreateUserRequest):
-    """
-    x
-    """
-    if get_user(create_user_request.email):
-        # Email is already registered
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Email address already registered: {create_user_request.email}",
-        )
-    else:
-        create_user_model = User(
-            email=create_user_request.email,
-            hashed_password=bcrypt_context.hash(create_user_request.password),
-            profile=create_user_request.profile,
-        )
-        # users_collection.insert_one(dict(create_user_model))
-        users_collection.insert_one(create_user_model.model_dump())
-
-
-@user_router.post("/token")
+@auth_router.post("/token")
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -148,11 +122,3 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
         "access_token": access_token,
         "token_type": "bearer",
     }
-
-
-@user_router.get("/profile/")
-async def get_user_profile(current_user: User = Depends(get_current_user)) -> User:
-    """
-    x
-    """
-    return current_user

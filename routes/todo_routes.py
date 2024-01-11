@@ -3,11 +3,13 @@ from fastapi import APIRouter, status
 
 from models.todo_model import Todo
 from config.db import todo_collection, users_collection
+from config.constants import API_PREFIX
+
 from bson import ObjectId
 from typing import List
 
 todo_router = APIRouter(
-    prefix="/api/v1/todo",
+    prefix=f"{API_PREFIX}/todo",
     tags=["todos"],
 )
 
