@@ -22,10 +22,10 @@ import os
 load_dotenv()
 
 # Access environment variables
-SECRET_KEY = f"""{os.getenv("TODOAPP_SECRET_KEY")}"""  # Generate Secret Key with `openssl rand -hex 32`
-ALGORITHM = f"""{os.getenv("TODOAPP_ALGORITHM")}"""
+SECRET_KEY = f"""{os.getenv("BACKEND_SECRET_KEY")}"""  # Generate Secret Key with `openssl rand -hex 32`
+ALGORITHM = f"""{os.getenv("BACKEND_ALGORITHM")}"""
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("TODOAPP_ACCESS_TOKEN_EXPIRE_MINUTES"))
+    os.getenv("BACKEND_ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 auth_router = APIRouter(
@@ -52,9 +52,21 @@ def create_access_token(email: str, id: str, expires_delta: timedelta) -> str:
     return jwt.encode(claims=encode, key=SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_user(email: str) -> User | None:
+def get_user(email: str, **kwargs) -> User | None:
     """
-    Uses the user's email address to find the account and return a `User` object
+    Uses the user's email address to find the account and return a `User` object.
+    If there is an `id` in the kwargs, assign it to the returned user.
+    """
+    for user_data in users_collection.find():
+        if user_data["email"] == email:
+            if "id" in kwargs:
+                user_data["user_id"] = kwargs["id"]
+            return User(**user_data)
+
+
+def get_user_id(email: str) -> User | None:
+    """
+    Uses the user's email address to find the account and return a `User` object.
     """
     for user_data in users_collection.find():
         if user_data["email"] == email:
@@ -63,7 +75,7 @@ def get_user(email: str) -> User | None:
 
 async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)]) -> User:
     """
-    Return a `User` object representing the active user, validated via an access token
+    Return a `User` object representing the active user, validated via an access token.
     """
     credential_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -84,15 +96,16 @@ async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)]) 
     except JWTError:
         raise credential_exception
 
-    user = get_user(email=token_data["username"])
+    user = get_user(email=token_data["username"], id=token_data["id"])
     if user is None:
         raise credential_exception
+    # user.user_id = token_data["id"]
     return user
 
 
 def authenticate_user(email: str, password: str) -> User:
     """
-    Authenticate by verifying the password is the same as the hashed_password in the db
+    Authenticate by verifying the password is the same as the hashed_password in the db.
     """
     user = get_user(email=email)
     if not user:

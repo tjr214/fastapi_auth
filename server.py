@@ -4,9 +4,8 @@ from fastapi import FastAPI, status, HTTPException
 
 from routes.todo_routes import todo_router
 from routes.user_routes import user_router
-from util.auth import auth_router
+from auth import auth_router
 
-from models.user_model import User
 
 app = FastAPI()
 

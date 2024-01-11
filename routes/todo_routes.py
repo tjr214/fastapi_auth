@@ -1,8 +1,12 @@
 # from rich import print
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
+
+from auth import get_authenticated_user, bcrypt_context
 
 from models.todo_model import Todo
-from config.db import todo_collection, users_collection
+from models.user_model import User
+
+from config.db import content_collection
 from config.constants import API_PREFIX
 
 from bson import ObjectId
@@ -15,37 +19,37 @@ todo_router = APIRouter(
 
 
 @todo_router.get("/", status_code=status.HTTP_200_OK)
-async def get_todos() -> List[dict]:
+async def get_todos(current_user: User = Depends(get_authenticated_user)) -> List[dict]:
     return_list = []
-    for todo_data in todo_collection.find():
-        todo = {
-            "id": str(todo_data["_id"]),
-            "name": todo_data["name"],
-            "description": todo_data["description"],
-            "task_complete": todo_data["task_complete"],
-        }
-        return_list.append(todo)
+    for todo_data in content_collection.find():
+        if todo_data["owner_id"] == current_user.user_id:
+            todo = {
+                "id": str(todo_data["_id"]),
+                "name": todo_data["name"],
+                "description": todo_data["description"],
+                "task_complete": todo_data["task_complete"],
+            }
+            return_list.append(todo)
     return return_list
 
 
 @todo_router.post("/", status_code=status.HTTP_201_CREATED)
-def post_todo(todo: Todo):
+def create_todo(todo: Todo, current_user: User = Depends(get_authenticated_user)):
     # Notice: NO ASYNC because writing to dB
-    todo_collection.insert_one(dict(todo))
-    return {
-        "status": 1,
-        "data": "insert_good",
-    }
+    # Insert the new Item into the `content_collection`
+    todo.owner_id = current_user.user_id
+    content_collection.insert_one(todo.model_dump())
 
 
 @todo_router.put("/{id}", status_code=status.HTTP_200_OK)
-def update_todo(id: str, todo: Todo):
+def update_todo(id: str, todo: Todo, current_user: User = Depends(get_authenticated_user)):
     # Notice: NO ASYNC because writing to dB
-    todo_collection.find_one_and_update(
-        {"_id": ObjectId(id)}, {"$set": dict(todo)})
+    todo.owner_id = current_user.user_id
+    content_collection.find_one_and_update(
+        {"_id": ObjectId(id)}, {"$set": todo.model_dump()})
 
 
 @todo_router.delete("/{id}", status_code=status.HTTP_200_OK)
-def delete_todo(id: str):
+def delete_todo(id: str, current_user: User = Depends(get_authenticated_user)):
     # Notice: NO ASYNC because writing to dB
-    todo_collection.find_one_and_delete({"_id": ObjectId(id)})
+    content_collection.find_one_and_delete({"_id": ObjectId(id)})

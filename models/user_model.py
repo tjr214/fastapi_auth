@@ -12,5 +12,4 @@ class UserProfile(BaseModel):
 class User(BaseModel):
     email: str
     hashed_password: str
-    profile: UserProfile
-    todos: List[Todo] = []
+    user_id: str

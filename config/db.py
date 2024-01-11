@@ -9,12 +9,16 @@ load_dotenv()
 
 # Access environment variables
 MONGODB_URI = f"""{os.getenv("MONGO_URI")}/?retryWrites=true&w=majority"""
-DATABASE = f"""{os.getenv("MONGO_DATABASE")}"""
-USERS_COLLECTION = f"""{os.getenv("MONGO_USERS_COLLECTION")}"""
-TODO_COLLECTION = f"""{os.getenv("MONGO_TODO_COLLECTION")}"""
+USERS_DATABASE = f"""{os.getenv("USERS_DATABASE")}"""
+CONTENT_DATABASE = f"""{os.getenv("CONTENT_DATABASE")}"""
+USERS_COLLECTION = f"""{os.getenv("USERS_COLLECTION")}"""
+CONTENT_COLLECTION = f"""{os.getenv("CONTENT_COLLECTION")}"""
 
 # Create a new client and connect to the server
 client = MongoClient(MONGODB_URI, server_api=ServerApi('1'))
-db = client[DATABASE]
-todo_collection = db[TODO_COLLECTION]
-users_collection = db[USERS_COLLECTION]
+users_db = client[USERS_DATABASE]
+content_db = client[CONTENT_DATABASE]
+
+# Define access to our collections
+users_collection = users_db[USERS_COLLECTION]
+content_collection = content_db[CONTENT_COLLECTION]
