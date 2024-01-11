@@ -1,4 +1,3 @@
-# from rich import print
 from fastapi import APIRouter, Depends, status
 
 from auth import get_authenticated_user, bcrypt_context

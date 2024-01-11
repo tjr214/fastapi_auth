@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from typing import Annotated
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -10,10 +11,6 @@ from datetime import datetime, timedelta
 from models.user_model import User
 from config.db import users_collection
 from config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
-
-# from util.user_utils import get_user
-
-from typing import Annotated
 
 from dotenv import load_dotenv
 import os
@@ -99,7 +96,6 @@ async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)]) 
     user = get_user(email=token_data["username"], id=token_data["id"])
     if user is None:
         raise credential_exception
-    # user.user_id = token_data["id"]
     return user
 
 

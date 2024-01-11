@@ -1,7 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import List
-
-from .todo_model import Todo
 
 
 class UserProfile(BaseModel):

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from bson import ObjectId
-from typing import List, Annotated
+# from typing import List, Annotated
 
 from auth import get_user, get_authenticated_user, bcrypt_context
 
@@ -20,13 +19,12 @@ user_router = APIRouter(
 class CreateUserRequest(BaseModel):
     email: str
     password: str
-    # profile: UserProfile
 
 
 @user_router.post("/", status_code=status.HTTP_201_CREATED)
 def create_user(create_user_request: CreateUserRequest):
     """
-    x
+    Create a new user in the dB.
     """
     if get_user(create_user_request.email):
         # Email is already registered
@@ -40,13 +38,12 @@ def create_user(create_user_request: CreateUserRequest):
             hashed_password=bcrypt_context.hash(create_user_request.password),
             user_id="0",
         )
-        # users_collection.insert_one(dict(create_user_model))
         users_collection.insert_one(create_user_model.model_dump())
 
 
-@user_router.get("/profile/")
+@user_router.get("/me/")
 async def get_user_profile(current_user: User = Depends(get_authenticated_user)) -> User:
     """
-    x
+    Returns a `User` object representing the current_user.
     """
     return current_user
