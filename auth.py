@@ -22,7 +22,7 @@ import os
 load_dotenv()
 
 # Access environment variables
-SECRET_KEY = f"""{os.getenv("BACKEND_SECRET_KEY")}"""  # Generate Secret Key with `openssl rand -hex 32`
+SECRET_KEY = f"""{os.getenv("BACKEND_SECRET_KEY")}"""
 ALGORITHM = f"""{os.getenv("BACKEND_ALGORITHM")}"""
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("BACKEND_ACCESS_TOKEN_EXPIRE_MINUTES"))
