@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+# from typing import List
 
 
 class UserProfile(BaseModel):
@@ -8,5 +9,7 @@ class UserProfile(BaseModel):
 
 class User(BaseModel):
     email: str
-    hashed_password: str
-    user_id: str
+    password: str
+    user_id: str | None = None
+    # active_sessions: List[str] | None = []
+    refresh_token: str | None = None

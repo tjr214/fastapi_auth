@@ -10,9 +10,9 @@ from auth import auth_router
 app = FastAPI()
 
 routers = [
+    auth_router,
     user_router,
     todo_router,
-    auth_router,
 ]
 
 # Add our routes:

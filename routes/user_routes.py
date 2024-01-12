@@ -35,8 +35,7 @@ def create_user(create_user_request: CreateUserRequest):
     else:
         create_user_model = User(
             email=create_user_request.email,
-            hashed_password=bcrypt_context.hash(create_user_request.password),
-            user_id="0",
+            password=bcrypt_context.hash(create_user_request.password),
         )
         users_collection.insert_one(create_user_model.model_dump())
 
