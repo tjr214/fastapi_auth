@@ -47,6 +47,8 @@ auth_router = APIRouter(
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/auth/token")
+github_oauth_bearer = OAuth2PasswordBearer(
+    tokenUrl=f"{API_PREFIX}/auth/github-code")
 
 credential_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -60,7 +62,7 @@ class Token(BaseModel):
     token_type: str
 
 
-def verify_access_token(token: Annotated[str, Depends(oauth2_bearer)]) -> dict | None:
+def verify_access_token(token: Annotated[str, Depends(oauth2_bearer)] | Annotated[str, Depends(github_oauth_bearer)]) -> dict | None:
     """
     Verify the token is a good token and has not expired or gotten itself involved in
     anything nefarious by associating with data of ill repute.
@@ -116,7 +118,7 @@ def get_user(email: str, **kwargs) -> User | None:
             return User(**user_data)
 
 
-async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)]) -> User | None:
+async def get_authenticated_user(token: Annotated[str, Depends(oauth2_bearer)] | Annotated[str, Depends(github_oauth_bearer)]) -> User | None:
     """
     Return a `User` object representing the active user, validated via an access token.
     """
@@ -209,6 +211,9 @@ async def renew_access_tokens(refresh_token: str):
 
 @auth_router.get("/github-login")
 async def github_login():
+    """
+    x
+    """
     # might also use: status.HTTP_307_TEMPORARY_REDIRECT
     print("[yellow]REDIRECT[/yellow]:", github_auth_url)
     return RedirectResponse(github_auth_url, status_code=status.HTTP_302_FOUND)
@@ -216,6 +221,9 @@ async def github_login():
 
 @auth_router.get("/github-code")
 async def github_code(code: str):
+    """
+    x
+    """
     print("[yellow]GITHUB YIELDED CODE[/yellow]:", code)
     params = {
         "client_id": GITHUB_CLIENT_ID,
