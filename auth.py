@@ -1,12 +1,14 @@
 from rich import print
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Annotated
 from bson import ObjectId
 
 from jose import jwt, JWTError, ExpiredSignatureError
 from passlib.context import CryptContext
+import httpx
 
 # import uuid
 from datetime import datetime, timedelta
@@ -21,13 +23,22 @@ import os
 # Load environment variables from the .env file
 load_dotenv()
 
-# Access environment variables
+# Access environment variables for Token Auth:
 SECRET_KEY = f"""{os.getenv("BACKEND_SECRET_KEY")}"""
 ALGORITHM = f"""{os.getenv("BACKEND_ALGORITHM")}"""
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("BACKEND_ACCESS_TOKEN_EXPIRE_MINUTES"))
 REFRESH_TOKEN_EXPIRE_DAYS = int(
     os.getenv("BACKEND_REFRESH_TOKEN_EXPIRE_DAYS"))
+
+# Access environment variables for Github OAuth:
+GITHUB_CLIENT_ID = f"""{os.getenv("GITHUB_CLIENT_ID")}"""
+GITHUB_SECRET_KEY = f"""{os.getenv("GITHUB_SECRET_KEY")}"""
+
+# Some Github OAuth variables:
+github_auth_url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}"
+github_token_url = "https://github.com/login/oauth/access_token"
+
 
 auth_router = APIRouter(
     prefix=f"{API_PREFIX}/auth",
@@ -194,3 +205,42 @@ async def renew_access_tokens(refresh_token: str):
         print(
             "[red]Attempted request for token refresh, but Refresh Token is INVALID![/red]")
         raise credential_exception
+
+
+@auth_router.get("/github-login")
+async def github_login():
+    # might also use: status.HTTP_307_TEMPORARY_REDIRECT
+    print("[yellow]REDIRECT[/yellow]:", github_auth_url)
+    return RedirectResponse(github_auth_url, status_code=status.HTTP_302_FOUND)
+
+
+@auth_router.get("/github-code")
+async def github_code(code: str):
+    print("[yellow]GITHUB YIELDED CODE[/yellow]:", code)
+    params = {
+        "client_id": GITHUB_CLIENT_ID,
+        "client_secret": GITHUB_SECRET_KEY,
+        "code": code,
+    }
+    headers = {"Accept": "application/json"}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url=github_token_url, params=params, headers=headers)
+    response = response.json()
+    print("RESPONSE FROM GITHUB TOKEN URL:", response)
+    access_token = response["access_token"]
+    token_data = {
+        "access_token": access_token,
+        "token_type": "Bearer",
+    }
+    async with httpx.AsyncClient() as client:
+        headers.update({"Authorization": f"Bearer {access_token}"})
+        response = await client.get(url="https://api.github.com/user", headers=headers)
+    response = response.json()
+    # print(response)
+    user_data = {}
+    if not response["email"]:
+        user_data["username"] = response["login"]
+    else:
+        user_data["username"] = response["email"]
+    print(user_data)
+    return token_data
