@@ -1,6 +1,6 @@
 # YO!
 
-tada!
+This should be the readme for Jinja Templates.
 
 ## TODO Section
 
