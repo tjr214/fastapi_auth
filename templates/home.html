@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<title>Page Title</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<p>{{ name }}</p>
+		<table>
+			<tr>
+				<th>Strain Name</th>
+				<th>Primary Terpine Code</th>
+			</tr>
+			{% for strain in buds %}
+			<tr>
+				<td>{{ strain.name }}</td>
+				<td>{{ strain.terps }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
