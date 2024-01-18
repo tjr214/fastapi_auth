@@ -9,12 +9,14 @@ from routes.user_routes import user_router
 from routes.jinja_routes import jinja_router
 from auth import auth_router
 
-
+# Define our app
 app = FastAPI()
 
+# Set the StaticFiles location for our assets (like CSS)
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
+# Add our routes
 routers = [
     auth_router,
     user_router,
@@ -22,7 +24,6 @@ routers = [
     jinja_router,
 ]
 
-# Add our routes:
 for router in routers:
     app.include_router(router=router)
 
