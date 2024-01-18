@@ -23,15 +23,9 @@ MA_LIST = [
 
 
 @jinja_router.get("/")
-async def name(request: Request):
-    name = "Sample Person"
+async def name(request: Request, name: str = "Sample Person"):
     return templates.TemplateResponse("home.html", {
         "request": request,
         "name": name,
         "buds": MA_LIST,
     })
-
-
-# @jinja_router.get("/output.css")
-# async def tailwind(request: Request):
-#     return templates.TemplateResponse("output.css", {"request": request})
