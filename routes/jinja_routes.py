@@ -30,3 +30,8 @@ async def name(request: Request):
         "name": name,
         "buds": MA_LIST,
     })
+
+
+# @jinja_router.get("/output.css")
+# async def tailwind(request: Request):
+#     return templates.TemplateResponse("output.css", {"request": request})

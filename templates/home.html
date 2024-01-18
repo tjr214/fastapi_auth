@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<title>Page Title</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href="../assets/output.css" rel="stylesheet" />
+		<title>Hello, There!</title>
 	</head>
 	<body>
 		<p>{{ name }}</p>
-		<table>
-			<tr>
-				<th>Strain Name</th>
-				<th>Primary Terpine Code</th>
+		<table class="bg-slate-500 w-full">
+			<tr class="flex">
+				<th class="flex-grow text-3xl text-center text-red-600 font-bold underline">Strain Name</th>
+				<th class="flex-grow text-3xl text-center text-emerald-600 font-bold underline">
+					Primary Terpine Code
+				</th>
 			</tr>
 			{% for strain in buds %}
-			<tr>
-				<td>{{ strain.name }}</td>
-				<td>{{ strain.terps }}</td>
+			<tr class="flex">
+				<td class="flex-grow text-center text-lg text-white">{{ strain.name }}</td>
+				<td class="flex-grow text-center text-lg text-white">{{ strain.terps }}</td>
 			</tr>
 			{% endfor %}
 		</table>

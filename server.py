@@ -1,6 +1,8 @@
 from rich import print
 
 from fastapi import FastAPI, status, HTTPException
+from fastapi.staticfiles import StaticFiles
+
 
 from routes.todo_routes import todo_router
 from routes.user_routes import user_router
@@ -9,6 +11,9 @@ from auth import auth_router
 
 
 app = FastAPI()
+
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+
 
 routers = [
     auth_router,
