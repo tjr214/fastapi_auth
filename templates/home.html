@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 	<head>
 		<meta charset="UTF-8" />
@@ -7,20 +7,24 @@
 		<title>Hello, There!</title>
 	</head>
 	<body>
-		<p>{{ name }}</p>
-		<table class="bg-slate-500 w-full">
-			<tr class="flex">
-				<th class="flex-grow text-3xl text-center text-red-600 font-bold underline">Strain Name</th>
-				<th class="flex-grow text-3xl text-center text-emerald-600 font-bold underline">
-					Primary Terpine Code
-				</th>
-			</tr>
-			{% for strain in buds %}
-			<tr class="flex">
-				<td class="flex-grow text-center text-lg text-white">{{ strain.name }}</td>
-				<td class="flex-grow text-center text-lg text-white">{{ strain.terps }}</td>
-			</tr>
-			{% endfor %}
-		</table>
+		<div>
+			<section class="h-screen bg-emerald-950">
+				<p class="font-mono text-yellow-500">Hello, {{ name }}!</p>
+				<table class="bg-slate-500 w-full">
+					<tr class="flex">
+						<th class="flex-grow text-3xl text-center text-red-600 font-bold underline">Strain Name</th>
+						<th class="flex-grow text-3xl text-center text-emerald-600 font-bold underline">
+							Primary Terpine Code
+						</th>
+					</tr>
+					{% for strain in buds %}
+					<tr class="flex">
+						<td class="flex-grow text-center text-lg text-white">{{ strain.name }}</td>
+						<td class="flex-grow text-center text-lg text-white">{{ strain.terps }}</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</section>
+		</div>
 	</body>
 </html>
