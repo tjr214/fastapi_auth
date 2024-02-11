@@ -20,6 +20,9 @@ from config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
 from dotenv import load_dotenv
 import os
 
+from log import get_logger
+logger = get_logger(__name__)
+
 # Load environment variables from the .env file
 load_dotenv()
 
@@ -79,8 +82,11 @@ def verify_access_token(token: Annotated[str, Depends(oauth2_bearer)] | Annotate
         exp = datetime.utcfromtimestamp(exp)
         check_date = exp - datetime.utcnow()
 
-        print(
-            f"[yellow]\[{email}] Time till token expiration:[/yellow]", check_date)
+        # print(
+        #     f"[yellow]\[{email}] Time till token expiration:[/yellow]", check_date)
+
+        logger.info(
+            f"[{email}] Time till token expiration: {check_date}")
 
         if email is None or user_id is None:
             raise credential_exception
@@ -215,7 +221,7 @@ async def github_login():
     x
     """
     # might also use: status.HTTP_307_TEMPORARY_REDIRECT
-    print("[yellow]REDIRECT[/yellow]:", github_auth_url)
+    logger.info(f"REDIRECT: {github_auth_url}")
     return RedirectResponse(github_auth_url, status_code=status.HTTP_302_FOUND)
 
 
@@ -224,7 +230,7 @@ async def github_code(code: str):
     """
     x
     """
-    print("[yellow]GITHUB YIELDED CODE[/yellow]:", code)
+    logger.info(f"GITHUB YIELDED CODE: {code}")
     params = {
         "client_id": GITHUB_CLIENT_ID,
         "client_secret": GITHUB_SECRET_KEY,
@@ -234,7 +240,7 @@ async def github_code(code: str):
     async with httpx.AsyncClient() as client:
         response = await client.post(url=github_token_url, params=params, headers=headers)
     response = response.json()
-    print("RESPONSE FROM GITHUB TOKEN URL:", response)
+    logger.info(f"RESPONSE FROM GITHUB TOKEN URL: {response}")
     access_token = response["access_token"]
     token_data = {
         "access_token": access_token,
@@ -244,7 +250,6 @@ async def github_code(code: str):
         headers.update({"Authorization": f"Bearer {access_token}"})
         response = await client.get(url="https://api.github.com/user", headers=headers)
     response = response.json()
-    # print(response)
     user_data = {}
     if not response["email"]:
         user_data["username"] = response["login"]

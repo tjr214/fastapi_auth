@@ -1,17 +1,17 @@
-from rich import print
-
 from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from auth import auth_router
+from log import get_logger
 
+from auth import auth_router
 from routes.todo_routes import todo_router
 from routes.user_routes import user_router
 from routes.jinja_routes import jinja_router
 
-from middleware.logger import log_middleware, logger
+from middleware.logger import log_middleware
 
+logger = get_logger(__name__)
 
 # Define our app and add any relevant middleware
 app = FastAPI()
