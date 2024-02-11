@@ -1,24 +1,25 @@
-from rich import print
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from starlette.responses import RedirectResponse
-from pydantic import BaseModel
+import os
 from typing import Annotated
 from bson import ObjectId
+from datetime import datetime, timedelta
+# import uuid
 
+from fastapi import APIRouter, Response, Request, Depends, HTTPException, status
+from starlette.responses import RedirectResponse
+from backend.auth_cookie import OAuth2PasswordBearerWithCookie
+from fastapi.security import OAuth2PasswordRequestForm  # , OAuth2PasswordBearer
+
+
+from pydantic import BaseModel
 from jose import jwt, JWTError, ExpiredSignatureError
 from passlib.context import CryptContext
 import httpx
 
-# import uuid
-from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 from backend.models.user_model import User
 from backend.config.db import users_collection
 from backend.config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
-
-from dotenv import load_dotenv
-import os
 
 from backend.log import get_logger
 logger = get_logger(__name__)
@@ -48,9 +49,13 @@ auth_router = APIRouter(
     tags=["auth"],
 )
 
+# Hashing context
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/auth/token")
-github_oauth_bearer = OAuth2PasswordBearer(
+
+# Use our special cookie-enabled OAuth2 bearers
+oauth2_bearer = OAuth2PasswordBearerWithCookie(
+    tokenUrl=f"{API_PREFIX}/auth/token")
+github_oauth_bearer = OAuth2PasswordBearerWithCookie(
     tokenUrl=f"{API_PREFIX}/auth/github-code")
 
 credential_exception = HTTPException(
@@ -150,7 +155,7 @@ def authenticate_user(email: str, password: str) -> User:
 
 
 @auth_router.post("/token")
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+async def login_for_access_token(response: Response, request: Request, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     """
     This is the login route for tokens (email/password login).
     It retrieves an `authenticated_user()` with the form's username and password,
@@ -158,8 +163,12 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     generates access & refresh tokens, adds the refresh token to the db and returns the access token.
     """
     user = authenticate_user(form_data.username, form_data.password)
+
     if not user:
+        error = "No good login."
         raise credential_exception
+        # return templates.TemplateResponse('auth/signin.html', {"error": error, "request": request}, status_code=301)
+
     user_id = users_collection.find_one({"email": user.email})["_id"]
     access_token = create_jwt_token(
         email=user.email,
@@ -180,11 +189,22 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     users_collection.find_one_and_update(
         {"_id": ObjectId(user_id)}, {"$set": {"refresh_token": refresh_token}})
 
-    return {
-        "access_token": access_token,
-        "token_type": "Bearer",
-        # "session_id": session_id,
-    }
+    response = RedirectResponse(
+        url="/", status_code=status.HTTP_302_FOUND)
+
+    # Now save the Token in a cookie
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True
+    )
+
+    return response
+    # return {
+    #     "access_token": access_token,
+    #     "token_type": "Bearer",
+    #     # "session_id": session_id,
+    # }
 
 
 @auth_router.post("/refresh", status_code=status.HTTP_200_OK)
