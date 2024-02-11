@@ -13,14 +13,14 @@ import httpx
 # import uuid
 from datetime import datetime, timedelta
 
-from models.user_model import User
-from config.db import users_collection
-from config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
+from backend.models.user_model import User
+from backend.config.db import users_collection
+from backend.config.constants import API_PREFIX, ERROR_CONNECTION_VALIDATION
 
 from dotenv import load_dotenv
 import os
 
-from log import get_logger
+from backend.log import get_logger
 logger = get_logger(__name__)
 
 # Load environment variables from the .env file

@@ -37,7 +37,7 @@ papertrail_formatter = logging.Formatter(
 
 # Create handlers
 io_stream_handler = logging.StreamHandler(sys.stdout)
-file_handler = logging.FileHandler("debug.log")
+file_handler = logging.FileHandler("logs/debug.log")
 papertrail_handler = SysLogHandler(address=(PAPERTRAIL_HOST, PAPERTRAIL_PORT))
 papertrail_handler.addFilter(ContextFilter())
 

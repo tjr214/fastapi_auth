@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Request, status
 from fastapi.templating import Jinja2Templates
 
-from config.constants import API_PREFIX
+from backend.config.constants import API_PREFIX
 
 jinja_router = APIRouter(
     prefix=f"/jinja",
     tags=["jinja2-template test routes"],
 )
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="frontend/templates")
 
 MA_LIST = [
     {

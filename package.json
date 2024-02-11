@@ -1,6 +1,15 @@
 {
-  "devDependencies": {
-    "prettier-plugin-tailwindcss": "^0.5.11",
-    "tailwindcss": "^3.4.1"
-  }
+	"devDependencies": {
+		"prettier-plugin-tailwindcss": "^0.5.11",
+		"tailwindcss": "^3.4.1"
+	},
+	"scripts": {
+		"start": "python server.py",
+		"dev": "SERVER_RELOAD=1 python server.py",
+		"tailwind": "npx tailwindcss -i frontend/templates/input.css -o frontend/static/css/styles.css",
+		"tailwind_watch": "npx tailwindcss -i frontend/templates/input.css -o frontend/static/css/styles.css --watch",
+		"clear_logs": "rm -rf logs/debug.log && touch logs/debug.log",
+		"reset_db": "python nuke_db.py",
+		"help": "echo 'AVAILABLE SCRIPTS:\n- start\t\t\t[start the server]\n- dev\t\t\t[start server in development mode]\n- tailwind\t\t[regenerate the wailwind css file]\n- tailwind_watch\t[have tailwind watch for changes in the frontend/template directory]\n- clear_logs\t\t[clear the logs director]\n- reset_db\t\t[WARNING: nuke the dB and start again from scratch!!!]\n'"
+	}
 }

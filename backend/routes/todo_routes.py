@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, status
 
-from auth import get_authenticated_user, bcrypt_context
+from backend.auth import get_authenticated_user, bcrypt_context
 
-from models.todo_model import Todo
-from models.user_model import User
+from backend.models.todo_model import Todo
+from backend.models.user_model import User
 
-from config.db import content_collection
-from config.constants import API_PREFIX
+from backend.config.db import content_collection
+from backend.config.constants import API_PREFIX
 
 from bson import ObjectId
 from typing import List

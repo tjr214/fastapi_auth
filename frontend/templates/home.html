@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link href="../assets/output.css" rel="stylesheet" />
+		<link href="../static/css/styles.css" rel="stylesheet" />
 		<title>Hello, There!</title>
 	</head>
 	<body>
@@ -19,7 +19,7 @@
 					</tr>
 					{% for strain in buds %}
 					<tr class="flex">
-						<td class="flex-grow text-center text-lg text-white">{{ strain.name }}</td>
+						<td class="flex-grow text-center text-lg text-orange-600 font-semibold">{{ strain.name }}</td>
 						<td class="flex-grow text-center text-lg text-white">{{ strain.terps }}</td>
 					</tr>
 					{% endfor %}
