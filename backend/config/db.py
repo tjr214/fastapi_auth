@@ -1,5 +1,7 @@
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
+from pymongo.database import Database
+from pymongo.collection import Collection
 
 from dotenv import load_dotenv
 import os
@@ -22,3 +24,11 @@ content_db = primary_mongo_client[CONTENT_DATABASE]
 # Define access to our collections
 users_collection = users_db[USERS_COLLECTION]
 content_collection = content_db[CONTENT_COLLECTION]
+
+
+def get_db(db_name: str) -> Database:
+    return primary_mongo_client[db_name]
+
+
+def get_collection(db: Database, collection_name: str) -> Collection:
+    return db[collection_name]

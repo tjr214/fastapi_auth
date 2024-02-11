@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 # from typing import List, Annotated
 
-from auth import get_user, get_authenticated_user, bcrypt_context
+from backend.auth import get_user, get_authenticated_user, bcrypt_context
 
-from models.user_model import User, UserProfile
+from backend.models.user_model import User, UserProfile
 
-from config.db import users_collection
-from config.constants import API_PREFIX
+from backend.config.db import users_collection
+from backend.config.constants import API_PREFIX
 
 
 user_router = APIRouter(
