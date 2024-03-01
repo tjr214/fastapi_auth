@@ -24,7 +24,7 @@ MA_LIST = [
 
 @jinja_router.get("/")
 async def name(request: Request, name: str = "Sample Person"):
-    return templates.TemplateResponse("home.html", {
+    return templates.TemplateResponse("pages/app/home/jinja_test.html", {
         "request": request,
         "name": name,
         "buds": MA_LIST,

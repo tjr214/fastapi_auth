@@ -6,7 +6,7 @@
 	"scripts": {
 		"start": "python server.py",
 		"dev": "SERVER_RELOAD=1 python server.py",
-		"tailwind": "npx tailwindcss -i frontend/templates/input.css -o frontend/static/css/styles.css",
+		"tailwind": "npx tailwindcss -i frontend/templates/css/input.css -o frontend/static/css/styles.css",
 		"tailwind_watch": "npx tailwindcss -i frontend/templates/input.css -o frontend/static/css/styles.css --watch",
 		"clear_logs": "rm -rf logs/debug.log && touch logs/debug.log",
 		"reset_db": "python nuke_db.py",

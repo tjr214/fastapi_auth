@@ -1,17 +1,22 @@
 import os
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from backend.auth import auth_router
-from backend.routes.todo_routes import todo_router
 from backend.routes.user_routes import user_router
+from backend.routes.todo_routes import todo_router
 from backend.routes.jinja_routes import jinja_router
 
 from backend.log import get_logger
 from backend.middleware.logger import log_route
+
+from backend.config.constants import (
+    FRONTEND_PAGE_TEMPLATES,
+    FRONTEND_APP_PAGES
+)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -30,12 +35,15 @@ app = FastAPI(
 app.add_middleware(BaseHTTPMiddleware, dispatch=log_route)
 
 # Set the StaticFiles location for our assets (like CSS and images, etc.)
-app.mount("/static", StaticFiles(directory="frontend/static"),
-          name="static-assets")
+app.mount(
+    "/static", StaticFiles(directory="frontend/static", html=True),
+    name="static-assets"
+)
+
+templates = Jinja2Templates(directory=FRONTEND_PAGE_TEMPLATES)
 
 # Add our routes
 routers = [
-    auth_router,
     user_router,
     todo_router,
     jinja_router,
@@ -52,8 +60,8 @@ async def get_favicon():
 
 # Handle the root "homepage" for the App
 @app.get("/", status_code=status.HTTP_200_OK)
-async def root_index():
-    return {"hello": "world"}
+async def root_index(request: Request):
+    return templates.TemplateResponse(f"{FRONTEND_APP_PAGES}/home/index.html", {"request": request})
 
 
 # Start the server with uvicorn

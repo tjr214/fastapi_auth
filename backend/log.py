@@ -52,7 +52,7 @@ def get_logger(name: str) -> Logger:
     logger = logging.getLogger(f"""{LOGGER_ROOT_NAME}.{name}""")
     # Add the handlers to the logger
     logger.handlers = [
-        io_stream_handler,
+        # io_stream_handler,
         file_handler,
         papertrail_handler,
     ]
