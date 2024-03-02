@@ -10,21 +10,22 @@
 		<div>
 			<section class="h-screen bg-emerald-950">
 				<p class="font-mono text-yellow-500">Hello, {{ name }}!</p>
-				<table class="bg-slate-500 w-full">
+				<table class="w-full bg-slate-500">
 					<tr class="flex">
-						<th class="flex-grow text-3xl text-center text-red-600 font-bold underline">Strain Name</th>
-						<th class="flex-grow text-3xl text-center text-emerald-600 font-bold underline">
+						<th class="flex-grow text-3xl font-bold text-center text-red-600 underline">Strain Name</th>
+						<th class="flex-grow text-3xl font-bold text-center underline text-emerald-600">
 							Primary Terpine Code
 						</th>
 					</tr>
 					{% for strain in buds %}
 					<tr class="flex">
-						<td class="flex-grow text-center text-lg text-orange-600 font-semibold">{{ strain.name }}</td>
-						<td class="flex-grow text-center text-lg text-white">{{ strain.terps }}</td>
+						<td class="flex-grow text-lg font-semibold text-center text-orange-600">{{ strain.name }}</td>
+						<td class="flex-grow text-lg text-center text-yellow-300">{{ strain.terps }}</td>
 					</tr>
 					{% endfor %}
 				</table>
 			</section>
 		</div>
+		<script src="../static/js/flowbite/flowbite.js"></script>
 	</body>
 </html>
