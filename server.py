@@ -61,7 +61,8 @@ async def get_favicon():
 # Handle the root "homepage" for the App
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root_index(request: Request):
-    return templates.TemplateResponse(f"{FRONTEND_APP_PAGES}/home/index.html", {"request": request})
+    return templates.TemplateResponse(f"/pages/test.html", {"request": request})
+    # return templates.TemplateResponse(f"{FRONTEND_APP_PAGES}/home/index.html", {"request": request})
 
 
 # Start the server with uvicorn

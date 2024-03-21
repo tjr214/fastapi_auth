@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Login Page</title>
+		<link href="../static/css/styles.css" rel="stylesheet" />
+	</head>
+	<body class="bg-gray-200">
+		<div class="flex justify-center items-center h-screen">
+			<div class="max-w-md w-full">
+				<div class="bg-white rounded-lg shadow-lg p-8">
+					<h2 class="text-2xl font-bold mb-6 text-center">Login to YOURAPP.</h2>
+
+					<form>
+						<div class="mb-4">
+							<label class="block text-gray-700 font-bold mb-2" for="email">Email:</label>
+							<div class="relative">
+								<input
+									class="shadow appearance-none border rounded w-full py-2 pl-10 pr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+									id="email"
+									type="email"
+									placeholder="supercool@email.com"
+								/>
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+										<path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+										<path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+									</svg>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-6">
+							<label class="block text-gray-700 font-bold mb-2" for="password">Password:</label>
+							<div class="relative">
+								<input
+									class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+									id="password"
+									type="password"
+									placeholder="********"
+								/>
+								<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+									<button type="button" class="focus:outline-none">
+										<svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+											<!-- Eye icon SVG code -->
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="flex items-center justify-end mb-6">
+							<a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot Password?</a>
+						</div>
+
+						<div class="mb-2">
+							<button
+								class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+								type="button"
+							>
+								Login
+							</button>
+						</div>
+
+						<div class="mb-4">
+							<button
+								class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center justify-center"
+								type="button"
+							>
+								<svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+									<path
+										fill-rule="evenodd"
+										clip-rule="evenodd"
+										d="M12 2C6.477 2 2 6.463 2 11.97c0 4.404 2.865 8.14 6.839 9.458.5.092.682-.216.682-.48 0-.236-.008-.864-.013-1.695-2.782.602-3.369-1.337-3.369-1.337-.454-1.151-1.11-1.458-1.11-1.458-.908-.618.069-.606.069-.606 1.003.07 1.531 1.027 1.531 1.027.892 1.524 2.341 1.084 2.91.828.092-.643.35-1.083.636-1.332-2.22-.251-4.555-1.107-4.555-4.927 0-1.088.39-1.979 1.029-2.675-.103-.252-.446-1.266.098-2.638 0 0 .84-.268 2.75 1.022A9.606 9.606 0 0 1 12 6.82c.85.004 1.705.114 2.504.336 1.909-1.29 2.747-1.022 2.747-1.022.546 1.372.202 2.386.1 2.638.64.696 1.028 1.587 1.028 2.675 0 3.83-2.339 4.673-4.566 4.92.359.307.678.915.678 1.846 0 1.332-.012 2.407-.012 2.734 0 .267.18.577.688.48 3.97-1.32 6.833-5.054 6.833-9.458C22 6.463 17.522 2 12 2Z"
+									/>
+								</svg>
+								Sign in with Github
+							</button>
+						</div>
+
+						<p class="text-left text-sm text-gray-600">
+							Not registered? <a href="#" class="text-blue-600 hover:text-blue-800">Create an account.</a>
+						</p>
+
+						<p class="text-center text-red-600 mt-4 font-semibold" id="error_text">
+							Error: invalid email or password!
+						</p>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script src="../static/js/flowbite/flowbite.js"></script>
+	</body>
+</html>
