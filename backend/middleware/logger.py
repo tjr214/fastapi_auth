@@ -17,5 +17,5 @@ async def log_route(request: Request, call_next):
     if request.query_params._dict:
         log_dict["query_params"] = request.query_params._dict
     log_dict["time_to_complete"] = time_end
-    logger.info(log_dict, extra=log_dict)
+    logger.debug(log_dict, extra=log_dict)
     return response

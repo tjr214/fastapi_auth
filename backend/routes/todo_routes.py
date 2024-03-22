@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from backend.auth import get_confirmed_user, bcrypt_context
+from backend.auth import get_user_from_token, bcrypt_context
 
 from backend.models.todo_model import Todo
 from backend.models.user_model import User
@@ -17,8 +17,8 @@ todo_router = APIRouter(
 )
 
 
-@todo_router.get("/", status_code=status.HTTP_200_OK)
-async def get_todos(current_user: User = Depends(get_confirmed_user)) -> List[dict]:
+@todo_router.get("/")
+async def get_todos(current_user: User = Depends(get_user_from_token)) -> List[dict]:
     return_list = []
     for todo_data in content_collection.find():
         if todo_data["owner_id"] == current_user.user_id:
@@ -33,7 +33,7 @@ async def get_todos(current_user: User = Depends(get_confirmed_user)) -> List[di
 
 
 @todo_router.post("/", status_code=status.HTTP_201_CREATED)
-def create_todo(todo: Todo, current_user: User = Depends(get_confirmed_user)):
+def create_todo(todo: Todo, current_user: User = Depends(get_user_from_token)):
     # Notice: NO ASYNC because writing to dB
     # Insert the new Item into the `content_collection`
     todo.owner_id = current_user.user_id
@@ -41,7 +41,7 @@ def create_todo(todo: Todo, current_user: User = Depends(get_confirmed_user)):
 
 
 @todo_router.put("/{id}", status_code=status.HTTP_200_OK)
-def update_todo(id: str, todo: Todo, current_user: User = Depends(get_confirmed_user)):
+def update_todo(id: str, todo: Todo, current_user: User = Depends(get_user_from_token)):
     # Notice: NO ASYNC because writing to dB
     todo.owner_id = current_user.user_id
     content_collection.find_one_and_update(
@@ -49,6 +49,6 @@ def update_todo(id: str, todo: Todo, current_user: User = Depends(get_confirmed_
 
 
 @todo_router.delete("/{id}", status_code=status.HTTP_200_OK)
-def delete_todo(id: str, current_user: User = Depends(get_confirmed_user)):
+def delete_todo(id: str, current_user: User = Depends(get_user_from_token)):
     # Notice: NO ASYNC because writing to dB
     content_collection.find_one_and_delete({"_id": ObjectId(id)})

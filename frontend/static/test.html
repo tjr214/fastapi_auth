@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+	<head>
+		<title>HTMX Example</title>
+		<script src="https://unpkg.com/htmx.org@1.8.4"></script>
+		<style>
+			.container {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div id="top-div">NOTHING HERE</div>
+			<div>
+				<button hx-get="../user/login" hx-target="#top-div">Click to Replace</button>
+			</div>
+		</div>
+	</body>
+</html>

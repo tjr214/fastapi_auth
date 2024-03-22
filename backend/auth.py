@@ -81,23 +81,19 @@ def verify_access_token(token: Annotated[str, Depends(oauth_bearer)] | Annotated
         exp = datetime.utcfromtimestamp(exp)
         check_date = exp - datetime.utcnow()
 
-        # print(
-        #     f"[yellow]\[{email}] Time till token expiration:[/yellow]", check_date)
-
-        logger.info(
+        logger.warning(
             f"[{email}] Time till token expiration: {check_date}")
 
         if email is None or user_id is None:
             raise credential_exception
         token_data = {"username": email, "id": user_id}
     except ExpiredSignatureError:
-        print("[red]ExpiredSignatureERROR![/red]")
-        logger.info("ExpiredSignature: Token has expired!")
+        logger.warning("ExpiredSignature: Token has expired!")
         return None
     except JWTError:
-        print("[red]BRO ALERT: [i]Bad Token Detected & Rejected, bruh.[/i][/red]")
-        logger.info("JWTError: Bad Token detected & rejected!")
-        raise credential_exception
+        logger.warning("JWTError: Bad Token detected & rejected!")
+        # raise credential_exception
+        return None
     return token_data
 
 
@@ -147,10 +143,12 @@ async def get_user_from_token(token: Annotated[str, Depends(oauth_bearer)] | Ann
     """
     token_data = verify_access_token(token=token)
     if not token_data:
-        raise credential_exception
+        # raise credential_exception
+        return None
     user = get_user_from_db(email=token_data["username"], id=token_data["id"])
     if user is None:
-        raise credential_exception
+        # raise credential_exception
+        return None
     return user
 
 
@@ -166,3 +164,16 @@ async def get_admin_from_token(token: Annotated[str, Depends(oauth_bearer)] | An
         return user
     else:
         raise credential_exception
+
+
+async def get_user_from_cookie(request: Request) -> User | None:
+    """
+    Return a `User` object representing the active `User`, validated via an access token encoded as a JWT.
+    """
+    cookie_value = request.cookies.get("rr-access-token")
+    if not cookie_value:
+        logger.warning("Unauthorized Access Attempted")
+        return None
+    else:
+        # print(f"Good Cookie! {cookie_value}")
+        return await get_user_from_token(token=cookie_value)

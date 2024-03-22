@@ -1,10 +1,12 @@
 import os
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, Depends, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from backend.auth import get_user_from_cookie
 
 from backend.routes.user_routes import user_router
 from backend.routes.todo_routes import todo_router
@@ -15,8 +17,9 @@ from backend.middleware.logger import log_route
 
 from backend.config.constants import (
     FRONTEND_PAGE_TEMPLATES,
-    FRONTEND_APP_PAGES
 )
+
+from backend.models.user_model import User
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -60,9 +63,15 @@ async def get_favicon():
 
 # Handle the root "homepage" for the App
 @app.get("/", status_code=status.HTTP_200_OK)
-async def root_index(request: Request):
-    return templates.TemplateResponse(f"/pages/test.html", {"request": request})
-    # return templates.TemplateResponse(f"{FRONTEND_APP_PAGES}/home/index.html", {"request": request})
+async def root_index(request: Request, active_user: User = Depends(get_user_from_cookie)):
+    if not active_user:
+        logger.warning(
+            "Cookie Not Found or Expired, Redirecting to Login Page...")
+        return RedirectResponse("/user/login", status_code=status.HTTP_302_FOUND)
+    else:
+        logger.info(
+            "Cookie Found! Yum! Tum! Bum! Redirecting to user homepage...")
+        return RedirectResponse("/user", status_code=status.HTTP_302_FOUND)
 
 
 # Start the server with uvicorn

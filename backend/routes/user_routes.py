@@ -11,9 +11,6 @@ from pydantic import BaseModel
 
 from backend.config.constants import (
     FRONTEND_PAGE_TEMPLATES,
-    FRONTEND_APP_PAGES,
-    FRONTEND_AUTH_PAGES,
-    FRONTEND_USER_PAGES
 )
 
 from backend.config.db import users_collection
@@ -34,7 +31,8 @@ from backend.auth import (
 from backend.auth import (
     get_password_hash,
     get_user_from_db,
-    get_user_from_token
+    get_user_from_token,
+    get_user_from_cookie,
 )
 
 
@@ -74,29 +72,31 @@ class CreateUserRequest(BaseModel):
 # ------------------------------------------------------------------------
 # GET SECTION (redirect to frontend)
 # ------------------------------------------------------------------------
-
-
 @user_router.get("/")
-async def get_index(request: Request):
-    return templates.TemplateResponse(f"{FRONTEND_APP_PAGES}/home/index.html", {"request": request})
+async def get_index(request: Request, active_user: User = Depends(get_user_from_cookie)):
+    if not active_user:
+        return RedirectResponse("/user/login", status_code=status.HTTP_302_FOUND)
+    # return templates.TemplateResponse(f"/static/test.html", {"request": request})
 
 
 @user_router.get("/profile")
-async def get_user_profile(request: Request, current_user: User = Depends(get_user_from_token)) -> User:
+async def get_user_profile(request: Request, active_user: User = Depends(get_user_from_cookie)) -> User:
     """
     Returns a `User` object representing the current_user.
     """
-    return current_user
+    if not active_user:
+        return RedirectResponse("/user/login", status_code=status.HTTP_302_FOUND)
+    return active_user
 
 
 @user_router.get("/register")
 async def get_signup(request: Request):
-    return templates.TemplateResponse(f"{FRONTEND_AUTH_PAGES}/register.html", {"request": request})
+    return templates.TemplateResponse(f"/register.html", {"request": request})
 
 
 @user_router.get("/login")
-async def get_signup(request: Request):
-    return templates.TemplateResponse(f"{FRONTEND_AUTH_PAGES}/login.html", {"request": request})
+async def email_login(request: Request):
+    return templates.TemplateResponse(f"/login.html", {"request": request})
 
 
 @user_router.get("/login/github")
@@ -125,7 +125,13 @@ async def github_code(code: str):
         response = await client.post(url=github_token_url, params=params, headers=headers)
     response = response.json()
     logger.info(f"RESPONSE FROM GITHUB TOKEN URL: {response}")
-    access_token = response["access_token"]
+
+    access_token = None
+    if "access_token" in response:
+        access_token = response["access_token"]
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     token_data = {
         "access_token": access_token,
         "token_type": "Bearer",
@@ -178,9 +184,8 @@ async def login_for_access_token(response: Response, request: Request, form_data
 
     if not user:
         error = "Could not validate connection."
-        # raise credential_exception
-        # return templates.TemplateResponse('auth/signin.html', {"error": error, "request": request}, status_code=301)
-        return templates.TemplateResponse(f"{FRONTEND_AUTH_PAGES}/login.html", {"error": error, "request": request}, status_code=status.HTTP_401_UNAUTHORIZED)
+        logger.info("Invalid Login Request.")
+        return templates.TemplateResponse(f"/login.html", {"error": error, "username": form_data.username, "password": form_data.password, "request": request}, status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = users_collection.find_one({"email": user.email})["_id"]
     access_token = create_access_token(
@@ -207,24 +212,22 @@ async def login_for_access_token(response: Response, request: Request, form_data
 
     # Save our Access Token in a cookie
     response.set_cookie(
-        key="access_token",
-        value=f"Bearer {access_token}",
+        key="rr-access-token",
+        # value=f"Bearer {access_token}",
+        value=f"{access_token}",
         httponly=True
     )
 
     # Now save the Refresh Token in a cookie
     response.set_cookie(
-        key="refresh_token",
-        value=f"Bearer {refresh_token}",
+        key="rr-refresh-token",
+        # value=f"Bearer {refresh_token}",
+        value=f"{refresh_token}",
+        # max_age=x,
         httponly=True
     )
 
     return response
-    # return {
-    #     "access_token": access_token,
-    #     "token_type": "Bearer",
-    #     # "session_id": session_id,
-    # }
 
 
 @user_router.post("/refresh_token", status_code=status.HTTP_200_OK)
