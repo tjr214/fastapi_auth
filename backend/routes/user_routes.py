@@ -96,7 +96,7 @@ async def get_signup(request: Request):
 
 @user_router.get("/login")
 async def email_login(request: Request):
-    return templates.TemplateResponse(f"/login.html", {"request": request})
+    return templates.TemplateResponse(f"/login.html", {"request": request, "appname": "Roger-Roger"})
 
 
 @user_router.get("/login/github")
